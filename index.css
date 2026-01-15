@@ -846,3 +846,129 @@ body {
         display: none;
     }
 }
+/* Advanced Recording Form */
+.set-rows-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.set-row {
+    background: var(--bg-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    animation: fadeIn var(--transition-fast);
+}
+
+.set-row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2px;
+}
+
+.set-number-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: var(--accent-gradient);
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.set-delete-btn {
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color var(--transition-fast);
+}
+
+.set-delete-btn:hover {
+    color: var(--danger);
+}
+
+.set-inputs-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-sm);
+}
+
+.set-memo-row {
+    margin-top: 2px;
+}
+
+.set-input-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    background: var(--bg-primary);
+    border-radius: var(--radius-sm);
+    padding: 2px 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.set-input-group:focus-within {
+    border-color: var(--accent-primary);
+}
+
+.set-input-group input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 4px 0;
+    text-align: right;
+}
+
+.set-input-group input:focus {
+    outline: none;
+}
+
+.set-unit {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    user-select: none;
+}
+
+.memo-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    padding: 4px 0;
+    transition: border-color var(--transition-fast);
+}
+
+.memo-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    color: var(--text-primary);
+}
+
+.memo-input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.5;
+}
+

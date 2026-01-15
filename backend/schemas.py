@@ -66,6 +66,7 @@ class RecordCreate(BaseModel):
     weight: float = 0
     reps: int = 0
     sets: int = 1
+    memo: Optional[str] = None
 
 
 class RecordResponse(BaseModel):
@@ -76,6 +77,7 @@ class RecordResponse(BaseModel):
     weight: float
     reps: int
     sets: int
+    memo: Optional[str] = None
     volume: float
 
     class Config:

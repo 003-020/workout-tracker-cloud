@@ -129,22 +129,13 @@
                     <!-- Recording Form -->
                     <div class="card recording-form" id="recording-form" style="display: none;">
                         <h2 id="selected-exercise-name">種目名</h2>
-                        <div class="set-inputs">
-                            <div class="input-group">
-                                <label>重量 (kg)</label>
-                                <input type="number" id="weight-input" class="number-input" min="0" step="0.5"
-                                    placeholder="0">
-                            </div>
-                            <div class="input-group">
-                                <label>Reps</label>
-                                <input type="number" id="reps-input" class="number-input" min="0" placeholder="0">
-                            </div>
-                            <div class="input-group">
-                                <label>Sets</label>
-                                <input type="number" id="sets-input" class="number-input" min="1" value="1"
-                                    placeholder="1">
-                            </div>
+                        <div id="set-rows-container" class="set-rows-container">
+                            <!-- Rows will be added here by JS -->
                         </div>
+                        <button id="add-set-btn" class="secondary-btn"
+                            style="margin-bottom: var(--spacing-md); width: 100%;">
+                            + セットを追加
+                        </button>
                         <button id="add-record-btn" class="primary-btn">記録を追加</button>
                     </div>
 

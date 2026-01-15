@@ -42,7 +42,7 @@ class Exercise(Base):
 
 
 class Record(Base):
-    __tablename__ = "records"
+    __tablename__ = "workout_records"
 
     id = Column(Integer, primary_key=True, index=True)
     date = Column(String, index=True)
@@ -51,9 +51,11 @@ class Record(Base):
     weight = Column(Float, default=0)
     reps = Column(Integer, default=0)
     sets = Column(Integer, default=1)
+    memo = Column(String, nullable=True)  # メモ欄を追加
     volume = Column(Float, default=0)
     user_id = Column(Integer, ForeignKey("users.id"))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     owner = relationship("User", back_populates="records")
     exercise = relationship("Exercise", back_populates="records")
+

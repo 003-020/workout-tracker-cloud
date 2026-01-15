@@ -522,10 +522,14 @@ const App = {
         form.style.display = 'block';
         document.getElementById('selected-exercise-name').textContent = exercise ? exercise.name : '';
 
-        document.getElementById('weight-input').value = '';
-        document.getElementById('reps-input').value = '';
-        document.getElementById('sets-input').value = '1';
-        document.getElementById('weight-input').focus();
+        // Initialize rows (default 3 empty rows)
+        this.renderSetRows(3);
+
+        // Focus first weight input
+        const firstRow = document.querySelector('.set-row');
+        if (firstRow) {
+            firstRow.querySelector('.weight-input').focus();
+        }
     },
 
     async addRecord() {
@@ -535,24 +539,126 @@ const App = {
         }
 
         const date = document.getElementById('workout-date').value;
-        const weight = document.getElementById('weight-input').value;
-        const reps = document.getElementById('reps-input').value;
-        const sets = document.getElementById('sets-input').value;
+        const rows = document.querySelectorAll('.set-row');
+        const records = [];
 
-        if (!reps || parseInt(reps) === 0) {
-            alert('Reps数を入力してください');
+        // Collect data from each row
+        rows.forEach((row, index) => {
+            const weight = row.querySelector('.weight-input').value;
+            const reps = row.querySelector('.reps-input').value;
+            const memo = row.querySelector('.memo-input').value;
+
+            if (reps && parseInt(reps) > 0) {
+                records.push({
+                    date: date,
+                    exercise_id: this.selectedExerciseId,
+                    weight: parseFloat(weight) || 0,
+                    reps: parseInt(reps),
+                    sets: 1, // Store as individual sets
+                    memo: memo
+                });
+            }
+        });
+
+        if (records.length === 0) {
+            alert('少なくとも1つのセット（回数）を入力してください');
             return;
         }
 
         this.updateSyncStatus('syncing', '保存中...');
-        await RecordManager.add(date, this.selectedExerciseId, weight, reps, sets);
+        try {
+            await ApiClient.request('/records', 'POST', records);
 
-        this.selectedExerciseId = null;
-        document.getElementById('recording-form').style.display = 'none';
-        document.querySelectorAll('.exercise-chip').forEach(chip => chip.classList.remove('selected'));
+            this.selectedExerciseId = null;
+            document.getElementById('recording-form').style.display = 'none';
+            document.querySelectorAll('.exercise-chip').forEach(chip => chip.classList.remove('selected'));
 
-        this.renderTodayRecords();
-        this.updateSyncStatus('synced', '保存完了');
+            this.renderTodayRecords();
+            this.updateSyncStatus('synced', '保存完了');
+        } catch (error) {
+            console.error(error);
+            this.updateSyncStatus('error', '保存失敗');
+            alert('保存に失敗しました');
+        }
+    },
+
+    // --- New Helper Methods for Advanced Recording ---
+
+    currentSets: [], // Store current row data temporarily if needed, or just read from DOM
+
+    renderSetRows(count = 3) {
+        const container = document.getElementById('set-rows-container');
+        container.innerHTML = '';
+        for (let i = 0; i < count; i++) {
+            this.addSetRow();
+        }
+    },
+
+    addSetRow(weight = '', reps = '', memo = '') {
+        const container = document.getElementById('set-rows-container');
+        const index = container.children.length + 1;
+
+        // Use previous weight if available and new row is empty
+        if (weight === '' && index > 1) {
+            const prevRow = container.lastElementChild;
+            const prevWeight = prevRow.querySelector('.weight-input').value;
+            if (prevWeight) weight = prevWeight;
+        }
+
+        const rowHtml = `
+            <div class="set-row">
+                <div class="set-row-header">
+                    <div class="set-number-badge">${index}</div>
+                    <button class="set-delete-btn" onclick="App.removeSetRow(this)">×</button>
+                </div>
+                <div class="set-inputs-row">
+                    <div class="set-input-group">
+                        <input type="number" class="weight-input" value="${weight}" step="0.5" placeholder="0">
+                        <span class="set-unit">kg</span>
+                    </div>
+                    <div class="set-input-group">
+                        <input type="number" class="reps-input" value="${reps}" min="0" placeholder="0">
+                        <span class="set-unit">reps</span>
+                    </div>
+                </div>
+                <div class="set-memo-row">
+                    <input type="text" class="memo-input" value="${memo}" placeholder="メモ (任意)">
+                </div>
+            </div>
+        `;
+
+        // Append HTML
+        container.insertAdjacentHTML('beforeend', rowHtml);
+
+        // Focus the reps input if it's a new empty row, or weight if totally new
+        const newRow = container.lastElementChild;
+        if (index > 1) {
+            newRow.querySelector('.reps-input').focus();
+        }
+    },
+
+    removeSetRow(btn) {
+        const container = document.getElementById('set-rows-container');
+        if (container.children.length <= 1) {
+            // Check if we should just clear inputs instead of removing the only row?
+            // Actually, let's allow removing but maybe immediately add one back or just alert?
+            // Let's just reset values if it's the last one
+            const row = btn.closest('.set-row');
+            row.querySelector('.weight-input').value = '';
+            row.querySelector('.reps-input').value = '';
+            row.querySelector('.memo-input').value = '';
+            return;
+        }
+
+        btn.closest('.set-row').remove();
+        this.renumberRows();
+    },
+
+    renumberRows() {
+        const rows = document.querySelectorAll('.set-row');
+        rows.forEach((row, index) => {
+            row.querySelector('.set-number-badge').textContent = index + 1;
+        });
     },
 
     async addCategory() {
