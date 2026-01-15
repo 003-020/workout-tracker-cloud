@@ -25,6 +25,11 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Root endpoint for health check
+@app.get("/")
+def read_root():
+    return {"message": "Workout Tracker API is running!"}
+
 # CORS設定（フロントエンドからのアクセスを許可）
 app.add_middleware(
     CORSMiddleware,
