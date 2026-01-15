@@ -919,7 +919,10 @@ const App = {
             <div class="record-item">
                 <div class="record-info">
                     <span class="record-exercise">${rec.exercise_name}</span>
-                    <span class="record-details">${rec.weight}kg × ${rec.reps}reps × ${rec.sets}sets = ${rec.volume}kg</span>
+                    <span class="record-details">
+                        ${rec.weight}kg × ${rec.reps}reps
+                        ${rec.memo ? `<br><small style="color:var(--text-muted)">📝 ${rec.memo}</small>` : ''}
+                    </span>
                 </div>
                 <button class="delete-btn" onclick="App.deleteRecord(${rec.id})">削除</button>
             </div>
