@@ -1050,4 +1050,13 @@ const App = {
 };
 
 // Initialize app when DOM is ready
-document.addEventListener('DOMContentLoaded', () => App.init());
+// Initialize app when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    App.init();
+
+    // Add event listener for new set button
+    const addSetBtn = document.getElementById('add-set-btn');
+    if (addSetBtn) {
+        addSetBtn.addEventListener('click', () => App.addSetRow());
+    }
+});
