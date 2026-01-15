@@ -567,7 +567,14 @@ const App = {
 
         this.updateSyncStatus('syncing', '保存中...');
         try {
-            await ApiClient.request('/records', 'POST', records);
+            const result = await ApiClient.request('/records', 'POST', records);
+
+            // Update cache with new records
+            if (Array.isArray(result)) {
+                result.forEach(record => RecordManager.cache.push(record));
+            } else if (result) {
+                RecordManager.cache.push(result);
+            }
 
             this.selectedExerciseId = null;
             document.getElementById('recording-form').style.display = 'none';
