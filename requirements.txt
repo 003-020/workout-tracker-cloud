@@ -1,0 +1,8 @@
+# Dummy file to satisfy Railway build detection
+fastapi
+uvicorn
+python-jose[cryptography]
+passlib[bcrypt]
+bcrypt
+sqlalchemy
+psycopg2-binary
