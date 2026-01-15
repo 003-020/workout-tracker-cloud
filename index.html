@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="筋トレ記録アプリ - クラウド対応版">
+    <title>💪 Workout Tracker Cloud</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="index.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Auth Screen -->
+        <div id="auth-screen" class="auth-screen">
+            <div class="auth-card">
+                <h1>💪 Workout Tracker</h1>
+                <p class="subtitle">クラウド対応版</p>
+
+                <div class="auth-tabs">
+                    <button class="auth-tab active" data-auth="login">ログイン</button>
+                    <button class="auth-tab" data-auth="register">新規登録</button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="login-form" class="auth-form active">
+                    <div class="form-group">
+                        <label for="login-email">メールアドレス</label>
+                        <input type="email" id="login-email" class="text-input" placeholder="example@email.com"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">パスワード</label>
+                        <input type="password" id="login-password" class="text-input" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="primary-btn">ログイン</button>
+                </form>
+
+                <!-- Register Form -->
+                <form id="register-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="register-email">メールアドレス</label>
+                        <input type="email" id="register-email" class="text-input" placeholder="example@email.com"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">パスワード</label>
+                        <input type="password" id="register-password" class="text-input" placeholder="6文字以上"
+                            minlength="6" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password-confirm">パスワード（確認）</label>
+                        <input type="password" id="register-password-confirm" class="text-input" placeholder="もう一度入力"
+                            required>
+                    </div>
+                    <button type="submit" class="primary-btn">アカウント作成</button>
+                </form>
+
+                <div id="auth-error" class="auth-error"></div>
+
+                <!-- Firebase Setup Notice -->
+                <div class="setup-notice" id="setup-notice">
+                    <p>⚠️ Firebase未設定</p>
+                    <p class="small">firebase-config.js を設定してください</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App (shown after login) -->
+        <div id="main-app" class="main-app" style="display: none;">
+            <!-- Header -->
+            <header class="app-header">
+                <h1>💪 Workout Tracker</h1>
+                <div class="header-actions">
+                    <span id="user-email" class="user-email"></span>
+                    <button id="logout-btn" class="icon-btn" title="ログアウト">🚪</button>
+                </div>
+            </header>
+
+            <!-- Sync Status -->
+            <div id="sync-status" class="sync-status">
+                <span class="sync-icon">☁️</span>
+                <span class="sync-text">同期中...</span>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="tab-navigation">
+                <button class="tab-btn active" data-tab="record">📝 記録</button>
+                <button class="tab-btn" data-tab="exercises">⚙️ 種目管理</button>
+                <button class="tab-btn" data-tab="stats">📊 グラフ</button>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Record Tab -->
+                <section id="record-tab" class="tab-content active">
+                    <!-- Date Picker -->
+                    <div class="card date-card">
+                        <label for="workout-date">📅 日付を選択</label>
+                        <input type="date" id="workout-date" class="date-input">
+                    </div>
+
+                    <!-- Exercise Selection -->
+                    <div class="card">
+                        <h2>種目を選択</h2>
+                        <div class="selection-tabs">
+                            <button class="selection-tab active" data-selection="all">すべての種目</button>
+                            <button class="selection-tab" data-selection="category">カテゴリから</button>
+                        </div>
+
+                        <!-- All Exercises List -->
+                        <div id="all-exercises-list" class="exercise-list selection-content active">
+                        </div>
+
+                        <!-- Category Selection -->
+                        <div id="category-selection" class="selection-content">
+                            <select id="category-select" class="select-input">
+                                <option value="">カテゴリを選択...</option>
+                            </select>
+                            <div id="category-exercises-list" class="exercise-list">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recording Form -->
+                    <div class="card recording-form" id="recording-form" style="display: none;">
+                        <h2 id="selected-exercise-name">種目名</h2>
+                        <div class="set-inputs">
+                            <div class="input-group">
+                                <label>重量 (kg)</label>
+                                <input type="number" id="weight-input" class="number-input" min="0" step="0.5"
+                                    placeholder="0">
+                            </div>
+                            <div class="input-group">
+                                <label>Reps</label>
+                                <input type="number" id="reps-input" class="number-input" min="0" placeholder="0">
+                            </div>
+                            <div class="input-group">
+                                <label>Sets</label>
+                                <input type="number" id="sets-input" class="number-input" min="1" value="1"
+                                    placeholder="1">
+                            </div>
+                        </div>
+                        <button id="add-record-btn" class="primary-btn">記録を追加</button>
+                    </div>
+
+                    <!-- Today's Records -->
+                    <div class="card">
+                        <h2>📋 本日の記録</h2>
+                        <div id="today-records" class="records-list">
+                            <p class="empty-message">まだ記録がありません</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Exercises Management Tab -->
+                <section id="exercises-tab" class="tab-content">
+                    <!-- Add Category -->
+                    <div class="card">
+                        <h2>📁 カテゴリ管理</h2>
+                        <p class="hint-text">カテゴリをクリックして種目を追加・削除</p>
+                        <div class="add-form">
+                            <input type="text" id="new-category-name" class="text-input"
+                                placeholder="新しいカテゴリ名（例: Push種目）">
+                            <button id="add-category-btn" class="secondary-btn">追加</button>
+                        </div>
+                        <div id="categories-list" class="categories-container">
+                        </div>
+                    </div>
+
+                    <!-- Category Detail -->
+                    <div class="card" id="category-detail-card" style="display: none;">
+                        <div class="card-header">
+                            <h2 id="category-detail-name">📁 カテゴリ名</h2>
+                            <button id="close-category-detail" class="icon-btn">✕</button>
+                        </div>
+                        <h3>カテゴリ内の種目</h3>
+                        <div id="category-exercises" class="exercise-chips">
+                        </div>
+                        <h3>種目を追加</h3>
+                        <div id="available-exercises" class="exercise-chips">
+                        </div>
+                    </div>
+
+                    <!-- Add Exercise -->
+                    <div class="card">
+                        <h2>🏋️ 種目管理</h2>
+                        <p class="hint-text">種目を作成後、カテゴリをクリックして追加できます</p>
+                        <div class="add-form">
+                            <input type="text" id="new-exercise-name" class="text-input"
+                                placeholder="新しい種目名（例: ベンチプレス）">
+                            <button id="add-exercise-btn" class="secondary-btn">追加</button>
+                        </div>
+                        <div id="exercises-list" class="exercises-container">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Stats Tab -->
+                <section id="stats-tab" class="tab-content">
+                    <div class="card">
+                        <h2>📊 種目別推移</h2>
+                        <select id="stats-exercise-select" class="select-input">
+                            <option value="">種目を選択...</option>
+                        </select>
+                        <div class="chart-container">
+                            <canvas id="progress-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h2>📈 統計サマリー</h2>
+                        <div id="stats-summary" class="stats-grid">
+                            <div class="stat-card">
+                                <span class="stat-value" id="total-workouts">0</span>
+                                <span class="stat-label">総トレーニング日数</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-value" id="total-volume">0</span>
+                                <span class="stat-label">総ボリューム (kg)</span>
+                            </div>
+                            <div class="stat-card">
+                                <span class="stat-value" id="max-weight">0</span>
+                                <span class="stat-label">最大重量 (kg)</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
