@@ -586,7 +586,7 @@ const App = {
         } catch (error) {
             console.error(error);
             this.updateSyncStatus('error', '保存失敗');
-            alert('保存に失敗しました');
+            alert(`保存に失敗しました: ${error.detail || error.message || '不明なエラー'}`);
         }
     },
 

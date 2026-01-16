@@ -16,7 +16,9 @@ from auth import (
     ACCESS_TOKEN_EXPIRE_MINUTES
 )
 
-# Create database tables
+# Create database tables (Force reset for schema update)
+# TODO: Remove drop_all in production after migration
+models.Base.metadata.drop_all(bind=engine)
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
