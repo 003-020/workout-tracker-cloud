@@ -237,38 +237,46 @@ async def get_records(
     return db.query(models.Record).filter(models.Record.user_id == current_user.id).all()
 
 
-@app.post("/records", response_model=schemas.RecordResponse)
-async def create_record(
-    record: schemas.RecordCreate,
+@app.post("/records", response_model=List[schemas.RecordResponse])
+async def create_records(
+    records: List[schemas.RecordCreate],
     current_user: models.User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """ワークアウト記録を作成"""
-    # Get exercise name
-    exercise = db.query(models.Exercise).filter(
-        models.Exercise.id == record.exercise_id,
-        models.Exercise.user_id == current_user.id
-    ).first()
+    """ワークアウト記録を一括作成"""
+    new_records = []
     
-    if not exercise:
-        raise HTTPException(status_code=404, detail="エクササイズが見つかりません")
+    for record_data in records:
+        # Get exercise name
+        exercise = db.query(models.Exercise).filter(
+            models.Exercise.id == record_data.exercise_id,
+            models.Exercise.user_id == current_user.id
+        ).first()
+        
+        exercise_name = exercise.name if exercise else "Unknown Exercise"
+        
+        # Calculate approximate volume (simple weight * reps * sets)
+        volume = record_data.weight * record_data.reps * record_data.sets
+        
+        new_record = models.Record(
+            user_id=current_user.id,
+            date=record_data.date,
+            exercise_id=record_data.exercise_id,
+            exercise_name=exercise_name,
+            weight=record_data.weight,
+            reps=record_data.reps,
+            sets=record_data.sets,
+            volume=volume,
+            memo=record_data.memo
+        )
+        db.add(new_record)
+        new_records.append(new_record)
     
-    volume = record.weight * record.reps * record.sets
-    
-    new_record = models.Record(
-        date=record.date,
-        exercise_id=record.exercise_id,
-        exercise_name=exercise.name,
-        weight=record.weight,
-        reps=record.reps,
-        sets=record.sets,
-        volume=volume,
-        user_id=current_user.id
-    )
-    db.add(new_record)
     db.commit()
-    db.refresh(new_record)
-    return new_record
+    for r in new_records:
+        db.refresh(r)
+        
+    return new_records
 
 
 @app.delete("/records/{record_id}")
