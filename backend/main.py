@@ -16,8 +16,9 @@ from auth import (
     ACCESS_TOKEN_EXPIRE_MINUTES
 )
 
-# Create database tables (Force reset for schema update)
-# TODO: Remove drop_all in production
+# Create database tables
+models.Base.metadata.create_all(bind=engine)
+
 app = FastAPI(
     title="Workout Tracker API",
     description="ワークアウト記録管理API",
