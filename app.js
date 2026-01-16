@@ -12,6 +12,8 @@ const ApiClient = {
     async request(endpoint, options = {}) {
         const headers = {
             'Content-Type': 'application/json',
+            'Cache-Control': 'no-store, no-cache, must-revalidate', // Prevent caching
+            'Pragma': 'no-cache',
             ...options.headers
         };
 
@@ -19,6 +21,27 @@ const ApiClient = {
             headers['Authorization'] = `Bearer ${accessToken}`;
             console.log('Using token:', accessToken.substring(0, 20) + '...');
         } else {
+// ... (middle parts unchanged) ...
+    async onUserLogin() {
+                this.showMainApp();
+                this.updateSyncStatus('syncing', '同期中...');
+
+                // Load all data
+                await CategoryManager.getAll();
+                await ExerciseManager.getAll();
+                await RecordManager.getAll();
+
+                // Update UI
+                document.getElementById('user-email').textContent = this.currentUserEmail;
+                this.bindMainEvents();
+                this.setTodayDate();
+                this.renderAll();
+
+                this.updateSyncStatus('synced', '同期完了');
+
+                // DIAGNOSTIC ALERT for User
+                alert(`【診断情報】\nこれをAIに伝えてください：\nUser: ${this.currentUserEmail}\nToken: ${accessToken ? 'OK' : 'MISSING'}\nEx Count: ${ExerciseManager.cache.length}\nAPI: ${API_BASE_URL.includes('railway') ? 'Cloud' : 'Local'}`);
+            },
             console.log('No token available');
         }
 
