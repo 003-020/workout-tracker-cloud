@@ -424,10 +424,6 @@ const App = {
         this.renderAll();
 
         this.updateSyncStatus('synced', '同期完了');
-
-        // DIAGNOSTIC ALERT for User
-        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
-        alert(`【診断情報】\nこれをAIに伝えてください：\nUser: ${this.currentUserEmail}\nToken: ${token ? 'OK' : 'MISSING'}\nEx Count: ${ExerciseManager.cache.length}\nAPI: ${API_BASE_URL.includes('railway') ? 'Cloud' : 'Local'}`);
     },
 
     showAuthScreen() {

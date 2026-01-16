@@ -17,10 +17,7 @@ from auth import (
 )
 
 # Create database tables (Force reset for schema update)
-# TODO: Remove drop_all in production after migration
-models.Base.metadata.drop_all(bind=engine)
-models.Base.metadata.create_all(bind=engine)
-
+# TODO: Remove drop_all in production
 app = FastAPI(
     title="Workout Tracker API",
     description="ワークアウト記録管理API",
@@ -31,16 +28,6 @@ app = FastAPI(
 @app.get("/")
 def read_root():
     return {"message": "Workout Tracker API is running!"}
-
-# Warning: This is a dangerous endpoint for debugging/fixing schema issues!
-@app.get("/reset_db_force")
-def reset_database_force():
-    try:
-        models.Base.metadata.drop_all(bind=engine)
-        models.Base.metadata.create_all(bind=engine)
-        return {"message": "Database has been completely reset. Schema is now up to date."}
-    except Exception as e:
-        return {"error": str(e)}
 
 # CORS設定（フロントエンドからのアクセスを許可）
 app.add_middleware(
