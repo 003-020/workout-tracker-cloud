@@ -24,8 +24,15 @@ const ApiClient = {
             console.log('No token available');
         }
 
+        // Force cache busting for GET requests
+        let url = `${API_BASE_URL}${endpoint}`;
+        if (options.method === 'GET' || !options.method) {
+            const separator = url.includes('?') ? '&' : '?';
+            url += `${separator}_t=${new Date().getTime()}`;
+        }
+
         try {
-            const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+            const response = await fetch(url, {
                 ...options,
                 headers
             });
