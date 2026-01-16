@@ -567,7 +567,8 @@ const App = {
 
         this.updateSyncStatus('syncing', '保存中...');
         try {
-            const result = await ApiClient.request('/records', 'POST', records);
+            // Correctly use ApiClient.post so records are sent as body
+            const result = await ApiClient.post('/records', records);
 
             // Update cache with new records
             if (Array.isArray(result)) {
